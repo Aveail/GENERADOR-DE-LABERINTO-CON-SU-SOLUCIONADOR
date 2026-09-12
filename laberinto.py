@@ -16,7 +16,7 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 
-# Crear pantalla
+# Crear pantalla laberinto
 screen = pygame.display.set_mode((columnas * tamaño_celdas, filas * tamaño_celdas))
 pygame.display.set_caption("Generador y Solucionador de Laberintos")
 
