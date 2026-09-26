@@ -1,13 +1,14 @@
 import pygame
 import random
 from collections import deque
+import time
 
-# Inicialización de Pygame
 pygame.init()
 
 # Parámetros
 tamaño_celdas = 20
 filas, columnas = 25, 25
+tiempo_limite = 100   # segundos
 
 # Colores
 WHITE = (255, 255, 255)
@@ -16,11 +17,13 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 
-# Crear pantalla laberinto
-screen = pygame.display.set_mode((columnas * tamaño_celdas, filas * tamaño_celdas))
-pygame.display.set_caption("Generador y Solucionador de Laberintos")
+# Pantalla (+50 píxeles arriba para el contador)
+screen = pygame.display.set_mode((columnas * tamaño_celdas, filas * tamaño_celdas + 50))
+pygame.display.set_caption("Proyecto Laberinto")
 
-# Generador de laberinto con algoritmo DFS
+font = pygame.font.Font(None, 36)
+
+# Generador de laberinto
 def generar_laberinto(filas, columnas):
     laberinto = [[1 for _ in range(columnas)] for _ in range(filas)]
     stack = [(1, 1)]
@@ -46,7 +49,7 @@ def generar_laberinto(filas, columnas):
     laberinto[filas-2][columnas-2] = 3  # meta
     return laberinto
 
-# Solucionador con BFS
+# Resolver con BFS
 def resolver_laberinto(laberinto):
     start = None
     end = None
@@ -56,6 +59,9 @@ def resolver_laberinto(laberinto):
                 start = (i,j)
             elif laberinto[i][j] == 3:
                 end = (i,j)
+
+    if not start or not end:
+        return []
 
     queue = deque([start])
     visited = {start: None}
@@ -71,7 +77,6 @@ def resolver_laberinto(laberinto):
                     visited[(nx,ny)] = (x,y)
                     queue.append((nx,ny))
 
-    # Reconstruir camino
     camino = []
     nodo = end
     while nodo:
@@ -91,26 +96,83 @@ def draw_laberinto(laberinto, camino=None):
                 color = GREEN
             elif laberinto[row][col] == 3:
                 color = RED
-            pygame.draw.rect(screen, color, (col*tamaño_celdas, row*tamaño_celdas, tamaño_celdas, tamaño_celdas))
+            pygame.draw.rect(screen, color, (col*tamaño_celdas, row*tamaño_celdas+50, tamaño_celdas, tamaño_celdas))
 
-    # Dibujar camino solucionador
     if camino:
         for (x,y) in camino:
-            pygame.draw.rect(screen, BLUE, (y*tamaño_celdas, x*tamaño_celdas, tamaño_celdas, tamaño_celdas))
+            pygame.draw.rect(screen, BLUE, (y*tamaño_celdas, x*tamaño_celdas+50, tamaño_celdas, tamaño_celdas))
+
+# Obtener posición del jugador
+def get_player(laberinto):
+    for i in range(len(laberinto)):
+        for j in range(len(laberinto[0])):
+            if laberinto[i][j] == 2:
+                return i,j
+
+# Mover jugador
+def move_player(laberinto, dx, dy):
+    x,y = get_player(laberinto)
+    nx, ny = x+dx, y+dy
+    if 0 <= nx < len(laberinto) and 0 <= ny < len(laberinto[0]):
+        if laberinto[nx][ny] == 0:  # camino
+            laberinto[x][y] = 0
+            laberinto[nx][ny] = 2
+        elif laberinto[nx][ny] == 3:  # meta
+            laberinto[x][y] = 0
+            laberinto[nx][ny] = 2  # jugador entra en la meta
+            return True
+    return False
 
 # Bucle principal
 def main():
     laberinto = generar_laberinto(filas, columnas)
     camino = resolver_laberinto(laberinto)
 
+    start_time = time.time()
     running = True
+    mostrar_solucion = False
+    victoria = False
+    derrota = False
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.KEYDOWN and not victoria and not derrota:
+                if event.key == pygame.K_w or event.key == pygame.K_UP:
+                    victoria = move_player(laberinto, -1, 0)
+                elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
+                    victoria = move_player(laberinto, 1, 0)
+                elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
+                    victoria = move_player(laberinto, 0, -1)
+                elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+                    victoria = move_player(laberinto, 0, 1)
+
+        # ⏱️ Solo actualizar tiempo si no ganaste ni perdiste
+        if not victoria and not derrota:
+            elapsed = time.time() - start_time
+            tiempo_restante = max(0, tiempo_limite - int(elapsed))
+        else:
+            # Congelar el contador en el valor actual
+            tiempo_restante = tiempo_restante
 
         screen.fill(WHITE)
-        draw_laberinto(laberinto, camino)
+        texto = font.render(f"Tiempo: {tiempo_restante}", True, BLACK)
+        screen.blit(texto, (10, 10))
+
+        if tiempo_restante == 0 and not victoria:
+            mostrar_solucion = True
+            derrota = True
+
+        if victoria:
+            texto_victoria = font.render("¡Ganaste mi querido exitoso!", True, (0,128,0))
+            screen.blit(texto_victoria, (200, 10))
+
+        if derrota:
+            texto_derrota = font.render("¡Perdiste chibolo baboso!", True, (200,0,0))
+            screen.blit(texto_derrota, (200, 10))
+
+        draw_laberinto(laberinto, camino if mostrar_solucion else None)
         pygame.display.flip()
 
     pygame.quit()
