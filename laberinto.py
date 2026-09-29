@@ -82,9 +82,9 @@ def jugar_nivel(numero_nivel, config, es_ultimo_nivel):
     pygame.display.set_caption(f"Proyecto Laberinto - Nivel {numero_nivel + 1}")
 
     buttons_y = CONTADOR_HEIGHT + AREA_JUEGO_ALTO + 10
-    boton_reiniciar = pygame.Rect(20, buttons_y, 120, 40)
-    boton_solucion  = pygame.Rect(160, buttons_y, 160, 40)
-    boton_siguiente = pygame.Rect(160, buttons_y, 160, 40)
+    boton_reiniciar = pygame.Rect(50, buttons_y-5, 160, 40)
+    boton_solucion  = pygame.Rect(220, buttons_y-5, 160, 40)
+    boton_siguiente = pygame.Rect(220, buttons_y-5, 160, 40)
 
     laberinto = generar_laberinto(filas, columnas)
     camino = resolver_laberinto(laberinto)
@@ -142,26 +142,26 @@ def jugar_nivel(numero_nivel, config, es_ultimo_nivel):
         screen.blit(texto, (10, 10))
 
         if victoria:
-            msg = "¡Completaste todos los niveles!" if es_ultimo_nivel else "¡Ganaste mi querido exitoso!"
+            msg = "¡Completaste todos los niveles!" if es_ultimo_nivel else "¡¡¡Ganaste!!!"
             texto_victoria = font.render(msg, True, (0,128,0))
-            screen.blit(texto_victoria, (10, 42)) #texto para victoria 
-            pygame.draw.rect(screen, (70, 70, 200), boton_reiniciar)
+            screen.blit(texto_victoria, (15, 35)) #texto para victoria 
+            pygame.draw.rect(screen, (60, 70, 200), boton_reiniciar)
             texto_btn1 = font.render("Reiniciar", True, WHITE)
-            screen.blit(texto_btn1, (boton_reiniciar.x + 10, boton_reiniciar.y + 8))
+            screen.blit(texto_btn1, (boton_reiniciar.x + 28, boton_reiniciar.y + 8))
             if not es_ultimo_nivel:
-                pygame.draw.rect(screen, (70, 150, 70), boton_siguiente)
+                pygame.draw.rect(screen, (60, 150, 70), boton_siguiente)
                 texto_btn2 = font.render("Siguiente", True, WHITE)
-                screen.blit(texto_btn2, (boton_siguiente.x + 10, boton_siguiente.y + 8))
+                screen.blit(texto_btn2, (boton_siguiente.x + 23, boton_siguiente.y + 8))
 
         if derrota:
-            texto_derrota = font.render("¡Perdiste chibolo baboso!", True, (200,0,0))
+            texto_derrota = font.render("¡Perdiste :(!", True, (200,0,0))
             screen.blit(texto_derrota, (10, 42)) #texto para derrota
-            pygame.draw.rect(screen, (70, 70, 200), boton_reiniciar)
-            pygame.draw.rect(screen, (70, 150, 70), boton_solucion)
+            pygame.draw.rect(screen, (60, 70, 200), boton_reiniciar)
+            pygame.draw.rect(screen, (60, 150, 70), boton_solucion)
             texto_btn1 = font.render("Reiniciar", True, WHITE)
             texto_btn2 = font.render("Solución", True, WHITE)
-            screen.blit(texto_btn1, (boton_reiniciar.x + 10, boton_reiniciar.y + 8))
-            screen.blit(texto_btn2, (boton_solucion.x + 10, boton_solucion.y + 8))
+            screen.blit(texto_btn1, (boton_reiniciar.x + 28, boton_reiniciar.y + 8))
+            screen.blit(texto_btn2, (boton_solucion.x + 23, boton_solucion.y + 8))
 
         draw_laberinto(screen, laberinto, camino if mostrar_solucion else None)
         pygame.display.flip()
