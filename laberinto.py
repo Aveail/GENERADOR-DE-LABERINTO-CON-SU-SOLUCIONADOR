@@ -155,7 +155,7 @@ def jugar_nivel(numero_nivel, config, es_ultimo_nivel):
 
         if derrota:
             texto_derrota = font.render("¡Perdiste :(!", True, (200,0,0))
-            screen.blit(texto_derrota, (10, 42)) #texto para derrota
+            screen.blit(texto_derrota, (10, 33)) #texto para derrota
             pygame.draw.rect(screen, (60, 70, 200), boton_reiniciar)
             pygame.draw.rect(screen, (60, 150, 70), boton_solucion)
             texto_btn1 = font.render("Reiniciar", True, WHITE)
