@@ -1,3 +1,4 @@
+## Victor
 import pygame
 import time
 
@@ -88,7 +89,7 @@ def jugar_nivel(numero_nivel, config, es_ultimo_nivel):
 
     laberinto = generar_laberinto(filas, columnas)
     camino = resolver_laberinto(laberinto)
-
+### mine
     start_time = time.time()
     running = True
     mostrar_solucion = False
